@@ -17,10 +17,7 @@ export class Moving {
         this.hasen.map((e)=>e[0]+this.size*e[1]).sort().forEach(e => {
             nr = this.size*this.size*nr+e;
         });
-        console.log(this.fuechse);
         for (let fuchs of this.fuechse) {
-            console.log(fuchs);
-            console.log(fuchs.pos);
             nr = (this.size-1)*nr + fuchs.pos;
         }
         return nr;
