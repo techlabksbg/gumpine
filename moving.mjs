@@ -6,9 +6,40 @@ export class Moving {
     //  {'pos':2, "start":[0,1], "vec":[1,0]}
     constructor(fix, hasen, fuechse) {
         this.fix = fix;
+        this.size = this.fix.size;
         this.hasen = util.deepcopy(hasen);
         this.fuechse = util.deepcopy(fuechse);
         this.makeGrid();
+    }
+    
+    toNumber() {
+        let nr = 0;
+        this.hasen.map((e)=>e[0]+this.size*e[1]).sort().forEach(e => {
+            nr = this.size*this.size*nr+e;
+        });
+        console.log(this.fuechse);
+        for (let fuchs of this.fuechse) {
+            console.log(fuchs);
+            console.log(fuchs.pos);
+            nr = (this.size-1)*nr + fuchs.pos;
+        }
+        return nr;
+    }
+
+    fromNumber(nr) {
+        let hasen = util.deepcopy(this.hasen);
+        let fuechse = util.deepcopy(this.fuechse);
+        for (let i=fuechse.length-1; i>=0; i--) {
+            fuechse[i].pos = nr%(this.size-1);
+            nr = Math.floor(nr/(this.size-1));
+        }
+        for (let hase of hasen) {
+            let posnumber = nr % (this.size*this.size);
+            hase[0] = posnumber % this.size;
+            hase[1] = Math.floor(posnumber/this.size);
+            nr = Math.floor(nr/(this.size*this.size));
+        }
+        return new Moving(this.fix, hasen, fuechse);
     }
 
     makeGrid() {
