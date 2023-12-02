@@ -21,5 +21,13 @@ export const util = {
             str += "\n";
         }
         return str;
+    },
+
+    "vecadd":function(a,b) {
+        return [a[0]+b[0], a[1]+b[1]];
+    },
+
+    "vecmul":function(m, vec) {
+        return [m*vec[0], m*vec[1]];
     }
 }
