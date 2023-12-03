@@ -58,4 +58,26 @@ export class Moving {
         return util.toString(this.grid);
     }
 
+    *hasenZuege() {
+        let hasen = util.deepcopy(this.hasen);
+        for (let hase of hasen) {
+            let from = Array(...hase);
+            for (let dir of util.dirs) {
+                let p = util.vecadd(hase, dir);
+                let step = 1;
+                while (util.gridMatch(this.grid, p, (g)=>(g>=2))) {
+                    p = util.vecadd(p, dir);
+                    step++;
+                }
+                if (step>1 && util.gridMatch(this.grid, p, (g)=>(g<2))) {
+                    hase[0] = p[0];
+                    hase[1] = p[1];
+                    yield new Moving(this.fix, hasen, this.fuechse);
+                    hase[0] = from[0];
+                    hase[1] = from[1];
+                }
+            }
+        }
+    }
+
 }

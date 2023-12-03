@@ -29,5 +29,15 @@ export const util = {
 
     "vecmul":function(m, vec) {
         return [m*vec[0], m*vec[1]];
+    },
+
+    "dirs": [[1,0], [0,1], [-1,0], [0,-1]],
+
+    // condition ist eine Funktion, die true liefert,
+    // je nach Eintrag im grid.
+    "gridMatch":function(grid, p, condition) {
+        let n = grid.length;
+        return p[0]>=0 && p[1]>=0 && p[0]<n && p[1]<n && condition(grid[p[0]][p[1]]);
     }
+
 }
