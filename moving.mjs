@@ -12,6 +12,10 @@ export class Moving {
         this.makeGrid();
     }
     
+    maxPositions() {
+        return Math.pow(this.size*this.size, this.hasen.length)*Math.pow(this.size-1, this.fuechse.length);
+    }
+
     toNumber() {
         let nr = 0;
         this.hasen.map((e)=>e[0]+this.size*e[1]).sort().forEach(e => {
@@ -107,4 +111,53 @@ export class Moving {
         }
     }
 
+    // Annahme: Jetzige Situation ist eine Lösung.
+    explore() {
+        let nr = this.toNumber();
+        let todo = [nr];
+        let max = this.maxPositions();
+        let marks = new Uint8Array(Math.ceil(max/8));
+        util.setBit(marks, nr);
+        console.log(util.getBit(marks,nr));
+        let last = nr;
+        let parents = {};
+        parents[nr] = nr;
+        let positions = 1;
+        while (todo.length>0) {
+            nr = todo.shift();
+            last = nr;
+            let current = this.fromNumber(nr);
+            console.log(current.toString());
+            for (let zug of current.fuchsZuege()) {
+                let n = zug.toNumber();
+                if (!util.getBit(marks, n)) {
+                    todo.push(n);
+                    util.setBit(marks, n);
+                    parents[n] = nr;
+                    positions++;
+                }
+            }
+            for (let zug of current.hasenZuege()) {
+                console.log("Nachbar");
+                console.log(zug.toString());
+                let n = zug.toNumber();
+                if (!util.getBit(marks, n)) {
+                    // Prüfen, ob alle Hasen im Loch
+                    if (zug.hasen.every(h=>this.fix.grid[h[0]][h[1]]==util.loch)) {
+                        return false;
+                    }
+                    todo.push(n);
+                    util.setBit(marks, n);
+                    parents[n] = nr;
+                    positions++;
+                }
+            }
+        }
+        let solution = [last];
+        while (parents[last]!=last) {
+            last = parents[last];
+            solution.push(last);
+        }
+        return {'solution':solution, 'positions':positions};
+    }
 }

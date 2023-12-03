@@ -38,6 +38,12 @@ export const util = {
     "gridMatch":function(grid, p, condition) {
         let n = grid.length;
         return p[0]>=0 && p[1]>=0 && p[0]<n && p[1]<n && condition(grid[p[0]][p[1]]);
-    }
+    },
 
+    "setBit":function(marks, bit) {
+        marks[Math.floor(bit/8)] |= (1 << (bit % 8));
+    },
+    "getBit": function(marks, bit) {
+        return (0 != (marks[Math.floor(bit/8)] & ((1 << (bit % 8)))));
+    }
 }
