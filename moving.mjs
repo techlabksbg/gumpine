@@ -80,4 +80,31 @@ export class Moving {
         }
     }
 
+    *fuchsZuege() {
+        let fuechse = util.deepcopy(this.fuechse);
+        for (let fuchs of fuechse) {
+            let from = fuchs.pos;
+            for (let to = fuchs.pos+1; to<this.size-1; to++) {
+                let p = util.vecadd(fuchs.start, util.vecmul(to+1, fuchs.vec));
+                if (util.gridMatch(this.grid, p, (g)=>g==util.leer)) {
+                    fuchs.pos = to;
+                    yield new Moving(this.fix, this.hasen, fuechse);
+                    fuchs.pos = from;
+                } else {
+                    break;
+                }
+            }
+            for (let to = fuchs.pos-1; to>=0; to--) {
+                let p = util.vecadd(fuchs.start, util.vecmul(to, fuchs.vec));
+                if (util.gridMatch(this.grid, p, (g)=>g==util.leer)) {
+                    fuchs.pos = to;
+                    yield new Moving(this.fix, this.hasen, fuechse);
+                    fuchs.pos = from;
+                } else {
+                    break;
+                }
+            }
+        }
+    }
+
 }
