@@ -113,51 +113,53 @@ export class Moving {
 
     // Annahme: Jetzige Situation ist eine Lösung.
     explore() {
-        let nr = this.toNumber();
-        let todo = [nr];
-        let max = this.maxPositions();
-        let marks = new Uint8Array(Math.ceil(max/8));
-        util.setBit(marks, nr);
-        console.log(util.getBit(marks,nr));
-        let last = nr;
+
+        let todo = [];
+        let marks = new Uint8Array(Math.ceil(this.maxPositions()/8));
+        let last;
         let parents = {};
-        parents[nr] = nr;
-        let positions = 1;
+        let positions = 0;
+
+        let addPosition = function(parent, neu) {
+            todo.push(neu);
+            util.setBit(marks, neu);
+            parents[neu] = parent;
+            positions++;
+        }
+
+        let getSolution = function(start) {
+            let solution = [start];
+            while (parents[start]!=start) {
+                start = parents[start];
+                solution.push(start);
+            }
+            return solution;
+        }
+
+        let nr = this.toNumber();
+        addPosition(nr, nr);
+
         while (todo.length>0) {
             nr = todo.shift();
             last = nr;
             let current = this.fromNumber(nr);
-            console.log(current.toString());
             for (let zug of current.fuchsZuege()) {
                 let n = zug.toNumber();
                 if (!util.getBit(marks, n)) {
-                    todo.push(n);
-                    util.setBit(marks, n);
-                    parents[n] = nr;
-                    positions++;
+                    addPosition(nr, n);
                 }
             }
             for (let zug of current.hasenZuege()) {
-                console.log("Nachbar");
-                console.log(zug.toString());
                 let n = zug.toNumber();
                 if (!util.getBit(marks, n)) {
+                    addPosition(nr, n);
                     // Prüfen, ob alle Hasen im Loch
-                    if (zug.hasen.every(h=>this.fix.grid[h[0]][h[1]]==util.loch)) {
-                        return false;
+                    if (zug.hasen.every(h=>this.fix.grid[h[0]][h[1]]==util.loch)) {                        
+                        return {'solution':getSolution(n).reverse(), 'explored':positions};
                     }
-                    todo.push(n);
-                    util.setBit(marks, n);
-                    parents[n] = nr;
-                    positions++;
                 }
             }
         }
-        let solution = [last];
-        while (parents[last]!=last) {
-            last = parents[last];
-            solution.push(last);
-        }
-        return {'solution':solution, 'positions':positions};
+        return {'solution':getSolution(last), 'positions':positions};
     }
 }
