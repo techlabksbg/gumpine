@@ -1,4 +1,5 @@
 import {util} from "./util.mjs"
+import {Fix} from "./fix.mjs"
 
 export class Moving {
     // Hasen Array mit Koordinaten
@@ -11,7 +12,20 @@ export class Moving {
         this.fuechse = util.deepcopy(fuechse);
         this.makeGrid();
     }
+
+    static fromObj(obj) {
+        return new Moving(Fix.fromObj(obj.fix), obj.hasen, obj.fuechse);
+    }
     
+    toObj() {
+        return JSON.parse(JSON.stringify({
+            'fix':this.fix.toObj(),
+            'hasen': this.hasen,
+            'fuechse': this.fuechse
+        }));
+    }
+
+
     maxPositions() {
         return Math.pow(this.size*this.size, this.hasen.length)*Math.pow(this.size-1, this.fuechse.length);
     }
@@ -148,6 +162,8 @@ export class Moving {
                 if (!util.getBit(marks, n)) {
                     addPosition(nr, n);
                 }
+                // Wenn nach diesem Fuch-Zug die Situation immer noch eine
+                // Lösung ist, diese als Ziellösung markieren
                 if (zug.hasen.every(h=>this.fix.grid[h[0]][h[1]]==util.loch)) {                        
                     parents[n] = n;
                 }

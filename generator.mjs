@@ -1,5 +1,6 @@
 import { util } from "./util.mjs"
-
+import {Fix} from "./fix.mjs"
+import {Moving} from "./moving.mjs"
 
 export const generator = {
     "hasenPlaetze" : function(anzahlHasen) {
@@ -59,10 +60,15 @@ export const generator = {
         return pilzPositionen;
     },
 
+    // TODO: ist die Zeile oder Spalte leer, reicht es, eine Position
+    // zu generieren, alle anderen sind überflüssig, weil erreichbar.
+    // Bei einem Pilz auf der Zeile oder Spalte, reicht entweder die
+    // erstmögliche Position (wenn der Pilz nicht in der Mitte ist),
+    // oder die möglichen Position
     "fuchsPlaetze" : function(anzahlFuechse, hasen, pilze) {
         let size = 5;
         let fuchsPositionen = [];
-        if (anzahlFuechse==0) return fuchsPositionen;
+        if (anzahlFuechse==0) return [[]];
         let frei = new Array(size).fill(0).map(e=>new Array(size).fill(true));
         for (let hase of hasen) frei[hase[0]][hase[1]] = false;
         for (let pilz of pilze) frei[pilz[0]][pilz[1]] = false;
@@ -116,5 +122,24 @@ export const generator = {
             }
         }
         return fuchsPositionen;
-    }
+    },
+
+    "makePuzzles" : function*(anzahlHasen, anzahlPilze, anzahlFuechse) {
+        for (let hasen of generator.hasenPlaetze(anzahlHasen)) {
+            for (let pilze of generator.pilzPlaetze(anzahlPilze, hasen)) {
+                for (let fuechse of generator.fuchsPlaetze(anzahlFuechse, hasen, pilze)) {
+                    let f = new Fix(pilze);
+                    let m = new Moving(f, hasen, fuechse);
+                    let sol = m.explore();
+                    if ('positions' in sol) {
+                        let puzzle = {
+                            'base' : m.toObj(),
+                            'sol' : sol
+                        };
+                        yield puzzle;
+                    }
+                }
+            }
+        }
+    },
 } 

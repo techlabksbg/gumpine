@@ -10,6 +10,16 @@ export class Fix {
         this.makeGrid();
     }
 
+    static fromObj(obj) {
+        return new Fix(obj.pilze);
+    }
+
+    toObj() {
+        return JSON.parse(JSON.stringify({
+            'pilze' : this.pilze,
+        }));
+    }
+
     makeGrid() {
         // 5x5 Array mit Nullen gefüllt
         this.grid = new Array(this.size).fill(0).map((e)=>new Array(this.size).fill(0));
