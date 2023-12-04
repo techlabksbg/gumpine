@@ -148,6 +148,9 @@ export class Moving {
                 if (!util.getBit(marks, n)) {
                     addPosition(nr, n);
                 }
+                if (zug.hasen.every(h=>this.fix.grid[h[0]][h[1]]==util.loch)) {                        
+                    parents[n] = n;
+                }
             }
             for (let zug of current.hasenZuege()) {
                 let n = zug.toNumber();
