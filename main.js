@@ -2,7 +2,7 @@ import {Fix} from "./fix.mjs"
 import {Moving} from "./moving.mjs"
 import {generator} from "./generator.mjs"
 
-let puzzles = generator.makePuzzles(4,3,1);
+let puzzles = generator.makePuzzles(4,3,2);
 
 for (let puzzle of puzzles) {
     if (puzzle.sol.solution.length>20) {
