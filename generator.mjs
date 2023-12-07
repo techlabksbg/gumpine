@@ -68,12 +68,9 @@ export const generator = {
         for (let hase of hasen) frei[hase[0]][hase[1]] = false;
         for (let pilz of pilze) frei[pilz[0]][pilz[1]] = false;
 
-        let starts = [[0,1], [0,3], [1,0], [3,0]];
-        let vecs = [[1,0], [1,0], [0,1], [0,1]];
-
         let possible = function(pos, zeilespalte) {
-            let p1 = util.vecadd(starts[zeilespalte], util.vecmul(pos, vecs[zeilespalte]));
-            let p2 = util.vecadd(p1, vecs[zeilespalte]);
+            let p1 = util.vecadd(util.fuchsStarts[zeilespalte], util.vecmul(pos, util.fuchsVecs[zeilespalte]));
+            let p2 = util.vecadd(p1, util.fuchsVecs[zeilespalte]);
             return (util.gridMatch(frei, p1, e=>e) && util.gridMatch(frei, p2, e=>e));
         }
        
@@ -82,13 +79,13 @@ export const generator = {
         let getFuchsPositionen = function(zvon, zbis) {
             let positionen = [];
             for (let zeilespalte=zvon; zeilespalte<zbis; zeilespalte++) {
-                let mitte = util.vecadd(starts[zeilespalte], util.vecmul(2, vecs[zeilespalte]));
+                let mitte = util.vecadd(util.fuchsStarts[zeilespalte], util.vecmul(2, util.fuchsVecs[zeilespalte]));
                 let pilzInDerMitte = !frei[mitte[0]][mitte[1]];
                 for (let pos=0; pos<4; pos++) {
                     if (possible(pos, zeilespalte)) {
                         positionen.push({"pos":pos, 
-                                            "start":starts[zeilespalte],
-                                            "vec":vecs[zeilespalte]});
+                                            "start":util.fuchsStarts[zeilespalte],
+                                            "vec":util.fuchsVecs[zeilespalte]});
                         if (!pilzInDerMitte) {
                             break;
                         }
@@ -106,7 +103,7 @@ export const generator = {
         if (anzahlFuechse==2) {
             for (let fp1 of getFuchsPositionen(0,3)) {
                 let zs1 = 0;
-                while (starts[zs1]!=fp1.start) zs1++;
+                while (util.fuchsStarts[zs1]!=fp1.start) zs1++;
                 let p1 = util.vecadd(fp1.start, util.vecmul(fp1.pos, fp1.vec));
                 let p2 = util.vecadd(p1, fp1.vec);
                 frei[p1[0]][p1[1]] = false;
@@ -130,7 +127,7 @@ export const generator = {
                     let sol = m.explore();
                     if ('positions' in sol) {
                         let puzzle = {
-                            'base' : m.toObj(),
+                            'base' : m.toMiniObj(),
                             'sol' : sol
                         };
                         yield puzzle;

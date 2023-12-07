@@ -24,6 +24,41 @@ export class Moving {
             'fuechse': this.fuechse
         }));
     }
+   
+    static fromMiniObj(obj) {
+        let fix = Fix.fromMiniObj(obj.fix);
+        let hasen = new Array(obj.h).fill([0,0]);
+        let nr = obj.f[1];
+        let fuechse = new Array(obj.f[0]).fill(0).map((e,i)=>{
+            let f = nr%4;
+            nr = Math.floor(nr/4);
+            return {'pos':0, 
+                    "start":util.fuchsStarts[f], 
+                    "vec":util.fuchsVecs[f]};
+        }).reverse();
+        return new Moving(fix, hasen , fuechse);
+    }
+    
+    toMiniObj() {
+        return {'fix':this.fix.toMiniObj(),
+                'h': this.hasen.length,
+                'f' : this.fuchsConfig()
+            };
+    }
+
+    fuchsConfig() {
+        let r = [this.fuechse.length, 0];
+        for (let i=0; i<this.fuechse.length; i++) {
+            for (let j=0; j<4; j++) {
+                if (util.fuchsStarts[j][0] == this.fuechse[i].start[0] &&
+                    util.fuchsStarts[j][1] == this.fuechse[i].start[1]) {
+                    r[1] = r[1]*4+j;
+                    break;
+                }
+            }
+        }
+        return r;
+    }
 
 
     maxPositions() {

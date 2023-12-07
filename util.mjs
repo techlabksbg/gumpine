@@ -45,5 +45,9 @@ export const util = {
     },
     "getBit": function(marks, bit) {
         return (0 != (marks[Math.floor(bit/8)] & ((1 << (bit % 8)))));
-    }
+    },
+
+    "fuchsStarts": [[0,1], [0,3], [1,0], [3,0]],
+    "fuchsVecs" : [[1,0], [1,0], [0,1], [0,1]],
+
 }

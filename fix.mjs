@@ -19,6 +19,35 @@ export class Fix {
             'pilze' : this.pilze,
         }));
     }
+    
+    toMiniObj() {
+        return [this.pilze.length, this.encodePilze()];
+    }
+
+    static fromMiniObj(obj) {
+        let pilze = new Array(obj[0]).fill(0).map(e=>[0,0]);
+        let fix = new Fix(pilze);
+        fix.decodePilze(obj[1]);
+        return fix;
+    }
+
+    encodePilze() {
+        let nr = 0;
+        this.pilze.map((e)=>e[0]+this.size*e[1]).sort().forEach(e => {
+            nr = this.size*this.size*nr+e;
+        });
+        return nr;
+    }
+
+    decodePilze(nr) {
+        for (let pilz of this.pilze) {
+            let posnumber = nr % (this.size*this.size);
+            pilz[0] = posnumber % this.size;
+            pilz[1] = Math.floor(posnumber/this.size);
+            nr = Math.floor(nr/(this.size*this.size));
+        }
+        this.makeGrid();
+    }
 
     makeGrid() {
         // 5x5 Array mit Nullen gefüllt
