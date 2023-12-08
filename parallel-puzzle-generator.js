@@ -7,7 +7,7 @@ import * as fs from "fs";
 
 if (isMainThread) {
 
-    let chunk = 10;
+    let chunk = 50;
     let numThreads = 10;
     const maxThreads = numThreads;
     
@@ -15,16 +15,12 @@ if (isMainThread) {
     let workers = [];
     let puzzles = [];
 
-    let anzahlHasen = 2;
-    let anzahlPilze = 1;
-    let anzahlFuechse = 1;
 
     var puzzlefile = fs.createWriteStream('puzzles.json');
     puzzlefile.write('[\n');
     
     let runWorker = function() {
         if (numThreads>0 && wdQueue.length>0) {
-            console.log(`Start Thread with wdQueue.lenth = ${wdQueue.length}`);
             let worker = new Worker("./parallel-puzzle-generator.js", wdQueue.pop());
             numThreads--;
             worker.on("message", msg => {
@@ -32,7 +28,7 @@ if (isMainThread) {
                     puzzles.push(p);
                     puzzlefile.write(JSON.stringify(p)+",\n");
                 }
-                console.log(`[Main]: Total of ${puzzles.length} puzzles`);
+                console.log(`Total ${puzzles.length} puzzles, Queue: ${wdQueue.length}`);
             });
             worker.on("error", err => console.error(err));
             worker.on("exit", code => {
@@ -47,23 +43,27 @@ if (isMainThread) {
         }
     }
 
-    for (let hasen of generator.hasenPlaetze(anzahlHasen)) {
-        let pilzePlaetze = generator.pilzPlaetze(anzahlPilze, hasen);
-        let startPos = 0;
-        while (startPos < pilzePlaetze.length) {
-            let wd = {"workerData" : {
-                "hasen" : util.deepcopy(hasen),
-                "pilzPlaetze" : pilzePlaetze.slice(startPos, startPos+chunk),
-                "anzahlFuechse" : anzahlFuechse,
-            }};
-            wdQueue.push(wd);
-            startPos+=chunk;
-            runWorker();
+
+    for (let anzahlHasen=1; anzahlHasen<5; anzahlHasen++) {
+        for (let anzahlPilze=1; anzahlPilze<4; anzahlPilze++) {
+            for (let anzahlFuechse=0; anzahlFuechse<3; anzahlFuechse++) {
+                for (let hasen of generator.hasenPlaetze(anzahlHasen)) {
+                    let pilzePlaetze = generator.pilzPlaetze(anzahlPilze, hasen);
+                    let startPos = 0;
+                    while (startPos < pilzePlaetze.length) {
+                        let wd = {"workerData" : {
+                            "hasen" : util.deepcopy(hasen),
+                            "pilzPlaetze" : pilzePlaetze.slice(startPos, startPos+chunk),
+                            "anzahlFuechse" : anzahlFuechse,
+                        }};
+                        wdQueue.push(wd);
+                        startPos+=chunk;
+                        runWorker();
+                    }
+                }
+            }
         }
     }
-
-
-
 } else {
     const data = workerData;
     let hasen = workerData.hasen;
@@ -85,6 +85,5 @@ if (isMainThread) {
             }
         }
     }
-    console.log(`Done with ${puzzles.length} puzzles.`);
     parentPort.postMessage(puzzles);
 }
