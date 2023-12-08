@@ -75,8 +75,8 @@ if (isMainThread) {
         for (let fuechse of generator.fuchsPlaetze(anzahlFuechse, hasen, pilze)) {
             let f = new Fix(pilze);
             let m = new Moving(f, hasen, fuechse);
-            let sol = m.explore();
-            if ('positions' in sol) {
+            let sol = m.explore();            
+            if ('positions' in sol && sol.positions>5 && sol.solution.length>2) {
                 let puzzle = {
                     'base' : m.toMiniObj(),
                     'sol' : sol
