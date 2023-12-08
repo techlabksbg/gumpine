@@ -3,18 +3,25 @@ import { generator } from "./generator.mjs"
 import { util } from "./util.mjs"
 import { Fix } from "./fix.mjs"
 import { Moving } from "./moving.mjs"
+import * as fs from "fs";
 
 if (isMainThread) {
 
     let chunk = 10;
     let numThreads = 10;
-    let anzahlHasen = 4;
-    let anzahlPilze = 3;
-    let anzahlFuechse = 2;
+    const maxThreads = numThreads;
+    
     let wdQueue = [];
     let workers = [];
     let puzzles = [];
 
+    let anzahlHasen = 2;
+    let anzahlPilze = 1;
+    let anzahlFuechse = 1;
+
+    var puzzlefile = fs.createWriteStream('puzzles.json');
+    puzzlefile.write('[\n');
+    
     let runWorker = function() {
         if (numThreads>0 && wdQueue.length>0) {
             console.log(`Start Thread with wdQueue.lenth = ${wdQueue.length}`);
@@ -23,6 +30,7 @@ if (isMainThread) {
             worker.on("message", msg => {
                 for (let p of msg) {
                     puzzles.push(p);
+                    puzzlefile.write(JSON.stringify(p)+",\n");
                 }
                 console.log(`[Main]: Total of ${puzzles.length} puzzles`);
             });
@@ -31,6 +39,10 @@ if (isMainThread) {
                 //console.log(`Thread finished with code ${code}`);
                 numThreads++;
                 runWorker();
+                // alles fertig?
+                if (numThreads == maxThreads && wdQueue.length==0) {
+                    puzzlefile.write("]\n");
+                }
             });
         }
     }
