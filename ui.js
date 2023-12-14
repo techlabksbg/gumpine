@@ -22,8 +22,32 @@ window.addEventListener('load', function(){
         }
 
         let ctx = canvas.getContext("2d");
+
+        
+        ctx.setTransform(w/5.2, 0, 0, w/5.2, w/5.2*0.6, w/5.2*0.6)
+
         ctx.fillStyle = '#0f2';
-        ctx.fillRect(0,0,w,h);
+        ctx.fillRect(-0.5,-0.5,5,5);
+
+        ctx.fillStyle = '#f02';
+        ctx.strokeStyle = '#080';
+        ctx.lineWidth = 0.05;
+
+        for (let x=0; x<5; x++) {
+            ctx.beginPath();
+            ctx.moveTo(x-0.5,-0.5);
+            ctx.lineTo(x-0.5,4.5);
+            ctx.moveTo(-0.5,x-0.5);
+            ctx.lineTo(4.5,x-0.5);
+
+            ctx.stroke();
+            for (let y=0; y<5; y++) {
+                ctx.beginPath();
+                ctx.arc(x,y,0.4, 0,2*Math.PI);
+                ctx.fill();
+            }
+        }
+
 
     }
 
